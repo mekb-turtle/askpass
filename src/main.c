@@ -25,7 +25,7 @@ static gboolean has_yes_no = false, is_yes_no = false;
 static void confirm_func() {
 	GtkEntryBuffer *buffer = gtk_entry_get_buffer(GTK_ENTRY(password_entry));
 	const char *password = gtk_entry_buffer_get_text(buffer);
-	printf("%s\n", password);
+	g_print("%s\n", password);
 	ok = true;
 	gtk_window_close(GTK_WINDOW(window));
 }
@@ -36,13 +36,13 @@ static void cancel_func() {
 }
 
 static void yes_func() {
-	printf("yes\n");
+	g_print("yes\n");
 	ok = true;
 	gtk_window_close(GTK_WINDOW(window));
 }
 
 static void no_func() {
-	printf("no\n");
+	g_print("no\n");
 	ok = true;
 	gtk_window_close(GTK_WINDOW(window));
 }
@@ -161,14 +161,11 @@ static void set_up_window(void) {
 	g_signal_connect(no_button, "clicked", G_CALLBACK(no_func), window);
 	g_signal_connect(other_button, "clicked", G_CALLBACK(other_func), window);
 
-	// When user closes window
-	g_signal_connect(window, "close-request", G_CALLBACK(cancel_func), NULL);
-
 	update_buttons();
 	update_text();
 
 	// TODO: allow resizing horizontally, but not vertically
-    gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
+	gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
 
 	gtk_window_present(window);
 }
@@ -243,7 +240,7 @@ static gint command_line(GApplication *app, GApplicationCommandLine *cmdline, gp
 end:
 	set_up_window();
 
-	return 5;
+	return 0;
 }
 
 int main(int argc, char *argv[]) {
@@ -252,5 +249,6 @@ int main(int argc, char *argv[]) {
 	int status = g_application_run(G_APPLICATION(app), argc, argv);
 	g_object_unref(app);
 
-	return status;
+	if (status != 0) return status;
+	return ok ? 0 : 1;
 }
